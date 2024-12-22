@@ -1,0 +1,10 @@
+email: test@gmail.com
+# routesDir: /etc/nginx/routes
+routesDir: ./routes
+routes:
+  - host: "test.example.com"
+    tls: true
+    upstream: "http://services:8080" 
+  - host: "t.example.com"
+    tls: true
+    upstream: "http://services-b:9000" 
