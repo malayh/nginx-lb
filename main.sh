@@ -5,7 +5,7 @@ RESOLVER_IP=""
 EMAIL=""
 
 mkdir -p "$ROUTES_DIR"
-test -f "$CONFIG_FILE" || { echo "Config file not found!"; exit 1; }
+test -f "$CONFIG_FILE" || { echo "Config file not found at $CONFIG_FILE"; exit 1; }
 test "$(jq empty "$CONFIG_FILE" 2>&1)" == "" || { echo "Invalid JSON config file!"; exit 1; }
 
 RESOLVER_IP=$(jq -r '.resolver' "$CONFIG_FILE")
