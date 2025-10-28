@@ -12,3 +12,4 @@ RUN chmod +x /etc/nginx/main.sh
 
 CMD ["/etc/nginx/main.sh"]
 
+

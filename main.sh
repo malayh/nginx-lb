@@ -1,6 +1,6 @@
 #!/bin/bash
 ROUTES_DIR="/etc/nginx/routes"
-CONFIG_FILE="$1"
+CONFIG_FILE="/etc/nginx/config.json"
 RESOLVER_IP=""
 EMAIL=""
 
