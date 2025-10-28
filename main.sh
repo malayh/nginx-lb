@@ -4,7 +4,8 @@ CONFIG_FILE="/etc/nginx/config.json"
 RESOLVER_IP=""
 EMAIL=""
 
-mkdir -p "$ROUTES_DIR"
+mkdir -p "/etc/nginx";
+
 test -f "$CONFIG_FILE" || { echo "Config file not found at $CONFIG_FILE"; exit 1; }
 test "$(jq empty "$CONFIG_FILE" 2>&1)" == "" || { echo "Invalid JSON config file!"; exit 1; }
 
