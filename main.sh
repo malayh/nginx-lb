@@ -42,7 +42,7 @@ function getCerts() {
             echo "Failed to get cert for $host"; 
             continue; 
         }
-
+        nginx -s reload;
         echo "Successfully obtained cert for $host";  
     done;
 }
@@ -50,7 +50,7 @@ function getCerts() {
 
 function main() {
     createRoutes;
-    nginx -g 'daemon off;';
+    nginx;
     sleep 5;
 
     while true; do
