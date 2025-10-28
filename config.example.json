@@ -1,0 +1,10 @@
+{
+    "email": "test@test.com",
+    "resolver": "127.0.0.11",
+    "routes": [
+        {
+            "host": "osuite.io",
+            "upstream": "http://osuite-fe:3000"
+        }
+    ]
+}

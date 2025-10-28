@@ -1,15 +1,14 @@
-FROM python:3.10.15-slim-bookworm
+FROM debian:bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y procps python3-certbot-nginx nginx && \
+    apt-get install -y python3-certbot-nginx nginx jq && \
     apt-get clean;
 
-RUN mkdir /app;
-WORKDIR /app;
-
-COPY requirements.txt main.py .
+WORKDIR /etc/nginx
 COPY nginx.conf /etc/nginx/nginx.conf
-RUN pip install -r requirements.txt;
+COPY route.template /etc/nginx/route.template
+COPY main.sh /etc/nginx/main.sh
+RUN chmod +x /etc/nginx/main.sh
 
-ENTRYPOINT ["python", "main.py"]
-CMD ["--config", "/app/config.yaml"]
+CMD ["/etc/nginx/main.sh"]
+
