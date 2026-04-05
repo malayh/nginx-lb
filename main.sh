@@ -36,15 +36,20 @@ function createRoutes() {
 }
 
 function getCerts() {
-    jq -r '.routes[] | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do 
+    jq -r '.routes[] | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do
         echo "Getting cert for $host";
-        certbot --nginx --agree-tos --non-interactive -m $EMAIL -d $host || { 
-            echo "Failed to get cert for $host"; 
-            continue; 
+        certbot --nginx --agree-tos --non-interactive -m $EMAIL -d $host || {
+            echo "Failed to get cert for $host";
+            continue;
         }
         nginx -s reload;
-        echo "Successfully obtained cert for $host";  
+        echo "Successfully obtained cert for $host";
     done;
+}
+
+function renewCerts() {
+    echo "Attempting to renew certificates...";
+    certbot renew --nginx --non-interactive && nginx -s reload;
 }
 
 
@@ -55,6 +60,7 @@ function main() {
 
     while true; do
         getCerts;
+        renewCerts;
         echo "Sleeping for 24 hours before next cert renewal attempt.";
         sleep 86400;
     done
