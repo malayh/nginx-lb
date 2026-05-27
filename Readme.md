@@ -30,7 +30,11 @@ For TCP routes:
 
 # Usage
 ```bash
-docker run  malayh/nginx-lb:2.0 -v /etc/letsencrypt:/etc/letsencrypt -v /etc/nginx/routes:/etc/nginx/routes -p 80:80 -p 443:443
+docker run  malayh/nginx-lb:3.0 \
+    -v /etc/letsencrypt:/etc/letsencrypt \
+    -v /etc/nginx/routes:/etc/nginx/routes \
+    -v /etc/nginx/streams:/etc/nginx/streams \
+    -p 80:80 -p 443:443
 ```
 
 Add `-p <port>:<port>` for each TCP route, e.g. `-p 5432:5432` for a Postgres route.
