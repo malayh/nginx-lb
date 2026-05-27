@@ -5,6 +5,11 @@
         {
             "host": "osuite.io",
             "upstream": "http://osuite-fe:3000"
+        },
+        {
+            "host": "testpg.internal.osuite.io",
+            "upstream": "test-pg:5432",
+            "type": "tcp"
         }
     ]
 }

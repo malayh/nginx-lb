@@ -1,10 +1,12 @@
 #!/bin/bash
 ROUTES_DIR="/etc/nginx/routes"
+STREAMS_DIR="/etc/nginx/streams"
 CONFIG_FILE="/etc/nginx/config.json"
 RESOLVER_IP=""
 EMAIL=""
 
 mkdir -p "/etc/nginx";
+mkdir -p "$STREAMS_DIR";
 
 test -f "$CONFIG_FILE" || { echo "Config file not found at $CONFIG_FILE"; exit 1; }
 test "$(jq empty "$CONFIG_FILE" 2>&1)" == "" || { echo "Invalid JSON config file!"; exit 1; }
@@ -24,19 +26,38 @@ function getRouteConfig() {
         gsub(/UPSTREAM/, upstream);
         gsub(/RESOLVER/, resolver);
         print;
-    }' 
+    }'
+}
+
+function getStreamConfig() {
+    cat stream.template | awk -v port="$1" -v upstream="$2" -v resolver="$RESOLVER_IP" '
+    {
+        gsub(/PORT/, port);
+        gsub(/UPSTREAM/, upstream);
+        gsub(/RESOLVER/, resolver);
+        print;
+    }'
 }
 
 function createRoutes() {
-    jq -r '.routes[] | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do 
+    jq -r '.routes[] | select(.type == null or .type == "http") | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do
         test -f "$ROUTES_DIR/$host.conf" && { echo "Route for $host already exists, skipping..."; continue; }
         echo "Creating route for $host -> $upstream";
         getRouteConfig "$host" "$upstream" > "$ROUTES_DIR/$host.conf";
     done;
 }
 
+function createStreams() {
+    jq -r '.routes[] | select(.type == "tcp") | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do
+        test -f "$STREAMS_DIR/$host.conf" && { echo "Stream for $host already exists, skipping..."; continue; }
+        port="${upstream##*:}"
+        echo "Creating stream for $host on :$port -> $upstream";
+        getStreamConfig "$port" "$upstream" > "$STREAMS_DIR/$host.conf";
+    done;
+}
+
 function getCerts() {
-    jq -r '.routes[] | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do
+    jq -r '.routes[] | select(.type == null or .type == "http") | "\(.host) \(.upstream)"' $CONFIG_FILE | while read -r host upstream; do
         echo "Getting cert for $host";
         certbot --nginx --agree-tos --non-interactive -m $EMAIL -d $host || {
             echo "Failed to get cert for $host";
@@ -55,6 +76,7 @@ function renewCerts() {
 
 function main() {
     createRoutes;
+    createStreams;
     nginx;
     sleep 5;
 
